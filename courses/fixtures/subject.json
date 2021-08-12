@@ -1,0 +1,96 @@
+[
+{
+  "model": "courses.subject",
+  "pk": 1,
+  "fields": {
+    "title": "Python",
+    "slug": "python"
+  }
+},
+{
+  "model": "courses.subject",
+  "pk": 2,
+  "fields": {
+    "title": "Music",
+    "slug": "music"
+  }
+},
+{
+  "model": "courses.course",
+  "pk": 1,
+  "fields": {
+    "owner": 1,
+    "subject": 1,
+    "title": "Programming",
+    "slug": "programming",
+    "overview": "This is a course to help a student understand basic concepts of python",
+    "created": "2021-08-11T23:08:59.405Z"
+  }
+},
+{
+  "model": "courses.course",
+  "pk": 2,
+  "fields": {
+    "owner": 1,
+    "subject": 2,
+    "title": "Piano",
+    "slug": "piano",
+    "overview": "Learn to read different notes and chords in music and music keys",
+    "created": "2021-08-11T23:29:30.857Z"
+  }
+},
+{
+  "model": "courses.module",
+  "pk": 1,
+  "fields": {
+    "Course": 1,
+    "title": "Conditional Statements",
+    "description": "IF...Else, ELIF & Switch Case"
+  }
+},
+{
+  "model": "courses.module",
+  "pk": 2,
+  "fields": {
+    "Course": 1,
+    "title": "Python variables",
+    "description": "How to Define/Declare String Variable Types"
+  }
+},
+{
+  "model": "courses.module",
+  "pk": 3,
+  "fields": {
+    "Course": 1,
+    "title": "Python Operators",
+    "description": "Arithmetic, Logical, Comparison and Assignment"
+  }
+},
+{
+  "model": "courses.module",
+  "pk": 4,
+  "fields": {
+    "Course": 2,
+    "title": "Fingers Placement",
+    "description": "Great pianists are those who know how to position their fingers correctly"
+  }
+},
+{
+  "model": "courses.module",
+  "pk": 5,
+  "fields": {
+    "Course": 2,
+    "title": "Basic chord excercise",
+    "description": "These are major, minor, and diminished. Major is full and complete. Minor is sad and morose and pensive. Diminished chords sound tense, dramatic, and unsettling."
+  }
+},
+{
+  "model": "courses.module",
+  "pk": 6,
+  "fields": {
+    "Course": 2,
+    "title": "Naming notes on the piano",
+    "description": "Name all black and white keys on the keyboard which are usually 88"
+  }
+}
+]
