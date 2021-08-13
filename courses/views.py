@@ -11,6 +11,7 @@ from .forms import ModuleFormSet
 from django.forms.models import modelform_factory
 from .models import Module, Content
 from django.apps import apps
+from braces.views import CSRFExemptMixin
 
 
 class OwnerMixin(object):
@@ -148,3 +149,12 @@ class ModuleContentListView(TemplateResponseMixin, View):
                                     id=module_id,
                                     course__owner=request.user)
         return self.render_to_response({'module': module})
+
+class ModuleOrderView(CSRFExemptMixin,
+                    JSONRequestResponseMixin,
+                    view):
+    def post(self, request):
+        for id, order in self.request_json.items():
+            Module.objects.filter(id=id,
+                                course__owner=request.user).update(order=order)
+        return self.render_json_response({'saved': 'OK'})
