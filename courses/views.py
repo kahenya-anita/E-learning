@@ -11,7 +11,8 @@ from .forms import ModuleFormSet
 from django.forms.models import modelform_factory
 from .models import Module, Content
 from django.apps import apps
-from braces.views import CSRFExemptMixin
+from django.views.decorators.csrf import csrf_exempt 
+from django.utils.decorators import method_decorator
 
 
 class OwnerMixin(object):
@@ -24,15 +25,24 @@ class OwnerEditMixin(object):
         form.instance.owner = self.request.user
         return super().form_valid(form)
 
-class OwnerCourseMixin(OwnerMixin):
-    model = Course
-    fields = ['subject', 'title', 'slug', 'overview']
+# class OwnerCourseMixin(OwnerMixin):
+#     model = Course
+#     fields = ['subject', 'title', 'slug', 'overview']
+#     success_url = reverse_lazy('manage_course_list')
+
+class OwnerCourseMixin(OwnerMixin,
+                        LoginRequiredMixin,
+                        PermissionRequiredMixin):
+    model = Coursefields = ['subject', 'title', 'slug', 'overview']
     success_url = reverse_lazy('manage_course_list')
 
 class OwnerCourseEditMixin(OwnerCourseMixin, OwnerEditMixin):
     template_name = 'courses/manage/course/form.html'
 
 class ManageCourseListView(OwnerCourseMixin, ListView):
+    '''
+        Lists courses created by the user
+    '''
     template_name = 'courses/manage/course/list.html'
     permission_required = 'courses.view_course'
 
@@ -46,13 +56,11 @@ class CourseDeleteView(OwnerCourseMixin, DeleteView):
     template_name = 'courses/manage/course/delete.html'
     permission_required = 'courses.delete_course'
 
-class OwnerCourseMixin(OwnerMixin,
-                        LoginRequiredMixin,
-                        PermissionRequiredMixin):
-    model = Coursefields = ['subject', 'title', 'slug', 'overview']
-    success_url = reverse_lazy('manage_course_list')
 
 class CourseModuleUpdateView(TemplateResponseMixin, View):
+    '''
+       Handles the formset to add, update and delete modules for a specific course 
+    '''
     template_name = 'courses/manage/module/formset.html'
     course = None
     def get_formset(self, data=None):
@@ -79,6 +87,9 @@ class CourseModuleUpdateView(TemplateResponseMixin, View):
     'formset': formset})
 
 class ContentCreateUpdateView(TemplateResponseMixin, View):
+    '''
+        Allows you to createand update different modules' contents
+    '''
     module = None
     model = None
     obj = None
@@ -131,7 +142,9 @@ class ContentCreateUpdateView(TemplateResponseMixin, View):
                                         'object': self.obj})
 
 class ContentDeleteView(View):
-
+    '''
+        Deletes by ID and redirects user to the list of other contents of the module
+    '''
     def post(self, request, id):
         content = get_object_or_404(Content,
         id=id,
@@ -142,6 +155,9 @@ class ContentDeleteView(View):
         return redirect('module_content_list', module.id)
 
 class ModuleContentListView(TemplateResponseMixin, View):
+    '''
+        Gets module by id of current user and renders the template it belongs to
+    '''
     template_name = 'courses/manage/module/content_list.html'
 
     def get(self, request, module_id):
@@ -150,11 +166,26 @@ class ModuleContentListView(TemplateResponseMixin, View):
                                     course__owner=request.user)
         return self.render_to_response({'module': module})
 
-class ModuleOrderView(CSRFExemptMixin,
-                    JSONRequestResponseMixin,
-                    view):
+class ModuleOrderView(object):
+    '''
+        Receives New order of modules IDS in JSON 
+    '''
+    @method_decorator(csrf_exempt)
     def post(self, request):
         for id, order in self.request_json.items():
             Module.objects.filter(id=id,
                                 course__owner=request.user).update(order=order)
         return self.render_json_response({'saved': 'OK'})
+
+
+class ContentOrderView(object):
+    '''
+        To order module's content
+    '''
+    @method_decorator(csrf_exempt)
+    def post(self,request):
+        for id, order in self.request_json.items():
+            Content.objects.filter(id=id,
+                                    module__course__owner=request.user) \
+                                    .update(order=order)
+        return self.render__json_response({'saved': 'OK'})
